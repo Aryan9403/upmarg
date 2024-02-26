@@ -1,13 +1,14 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import './NavigationBar.css'; // Import the CSS file here
 
 const NavigationBar = () => {
   return (
-    <nav>
+    <nav className="navbar"> {/* Add the class name here */}
       <Link to="/">Home</Link>
       <Link to="/login">Login</Link>
       <Link to="/register">Register</Link>
-      <Link to="/about">About</Link> {/* Update this line */}
+      <Link to="/about">About</Link>
     </nav>
   );
 };
