@@ -1,15 +1,11 @@
 const WebSocket = require('ws');
-const wss = new WebSocket.Server({ port: 3000 });
+const signalingRoutes = require('./SignalingRoutes');
 
-wss.on('connection', function connection(ws) {
-  ws.on('message', function incoming(message) {
-    // Broadcast messages to all clients except the sender
-    wss.clients.forEach(function each(client) {
-      if (client !== ws && client.readyState === WebSocket.OPEN) {
-        client.send(message);
-      }
-    });
-  });
-});
+// Initialize a WebSocket Server on a specific port
+const wss = new WebSocket.Server({ port: 5000 });
 
-console.log('WebSocket signaling server running on port 3000');
+// Log when the server starts
+console.log('Signaling server started on ws://localhost:5000');
+
+// Pass the WebSocket server to the signaling routes
+signalingRoutes(wss);

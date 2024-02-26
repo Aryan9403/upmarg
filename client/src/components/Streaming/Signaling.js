@@ -1,59 +1,55 @@
-// SignalingService.js
-class SignalingService {
-    constructor(wsUrl) {
-      this.ws = new WebSocket(wsUrl);
-      this.pc = new RTCPeerConnection();
-      this.setupWebSocket();
-      this.setupPeerConnection();
-    }
-  
-    setupWebSocket() {
-      this.ws.onmessage = async (message) => {
-        const data = JSON.parse(message.data);
-  
-        switch (data.type) {
-          case 'offer':
-            await this.handleOffer(data.offer);
-            break;
-          case 'answer':
-            await this.handleAnswer(data.answer);
-            break;
-          case 'ice-candidate':
-            await this.handleIceCandidate(data.candidate);
-            break;
-          default:
-            console.log('Unknown message type:', data.type);
-        }
-      };
-    }
-  
-    setupPeerConnection() {
-      this.pc.onicecandidate = ({ candidate }) => {
-        if (candidate) {
-          this.ws.send(JSON.stringify({ type: 'ice-candidate', candidate }));
-        }
-      };
-    }
-  
-    async handleOffer(offer) {
-      await this.pc.setRemoteDescription(new RTCSessionDescription(offer));
-      const answer = await this.pc.createAnswer();
-      await this.pc.setLocalDescription(answer);
-      this.ws.send(JSON.stringify({ type: 'answer', answer }));
-    }
-  
-    async handleAnswer(answer) {
-      await this.pc.setRemoteDescription(new RTCSessionDescription(answer));
-    }
-  
-    async handleIceCandidate(candidate) {
-      if (candidate) {
-        await this.pc.addIceCandidate(new RTCIceCandidate(candidate));
+import React, { useEffect, useRef, useContext } from 'react';
+import { WebSocketContext } from './WebSocketContext'; // Assume you have a context for WebSocket
+
+const Signaling = () => {
+  const ws = useContext(WebSocketContext); // Obtain WebSocket connection from context
+  const pc = useRef(new RTCPeerConnection());
+
+  useEffect(() => {
+    // Define what to do when icecandidates are generated
+    pc.current.onicecandidate = (event) => {
+      if (event.candidate) {
+        ws.send(JSON.stringify({ type: 'ice-candidate', candidate: event.candidate }));
       }
-    }
-  
-    // Additional methods for sending offers, handling media streams, etc.
-  }
-  
-  export default SignalingService;
-  
+    };
+
+    // Define what to do when a track is received
+    pc.current.ontrack = (event) => {
+      // Here you would handle the incoming media stream track
+      // For example, assigning it to a video element to display
+    };
+
+    // When receiving a message from the signaling server
+    ws.onmessage = async (message) => {
+      const data = JSON.parse(message.data);
+      
+      switch(data.type) {
+        case 'offer':
+          await pc.current.setRemoteDescription(new RTCSessionDescription(data.offer));
+          const answer = await pc.current.createAnswer();
+          await pc.current.setLocalDescription(answer);
+          ws.send(JSON.stringify({type: 'answer', answer}));
+          break;
+        case 'answer':
+          await pc.current.setRemoteDescription(new RTCSessionDescription(data.answer));
+          break;
+        case 'ice-candidate':
+          if (data.candidate) {
+            await pc.current.addIceCandidate(new RTCIceCandidate(data.candidate));
+          }
+          break;
+        // ... other message types as needed
+      }
+    };
+
+    return () => {
+      // Cleanup WebSocket listeners when the component unmounts
+      ws.onmessage = null;
+    };
+  }, [ws]);
+
+  // Signaling component does not render anything
+  return null;
+};
+
+export default Signaling;

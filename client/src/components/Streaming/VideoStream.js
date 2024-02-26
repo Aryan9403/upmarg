@@ -1,21 +1,26 @@
 import React, { useEffect, useRef } from 'react';
 
 const VideoStream = () => {
-  const videoRef = useRef(null);
+  const localVideoRef = useRef(null);
 
   useEffect(() => {
-    navigator.mediaDevices.getUserMedia({ video: true, audio: true })
-      .then(stream => {
-        if (videoRef.current) {
-          videoRef.current.srcObject = stream;
+    const getMedia = async () => {
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+        if (localVideoRef.current) {
+          localVideoRef.current.srcObject = stream;
         }
-      })
-      .catch(err => {
+      } catch (err) {
         console.error('Error accessing media devices.', err);
-      });
+      }
+    };
+
+    getMedia();
   }, []);
 
-  return <video ref={videoRef} controls autoPlay></video>;
+  return (
+    <video ref={localVideoRef} controls autoPlay playsInline muted></video>
+  );
 };
 
 export default VideoStream;
