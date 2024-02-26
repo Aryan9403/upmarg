@@ -5,6 +5,7 @@ import HomePage from './components/HomePage';
 import LoginPage from './components/LoginPage';
 import RegisterPage from './components/RegisterPage';
 import AboutPage from './components/AboutPage'; // Import the AboutPage component
+import 'path_to_your_pico_css_file.css';
 
 function App() {
   return (
