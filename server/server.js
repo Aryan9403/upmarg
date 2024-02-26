@@ -1,3 +1,4 @@
+import './server/Signalingserver.js'
 const express = require('express');
 const bcrypt = require('bcryptjs');
 const User = require('./models/User'); // Ensure this path matches your file structure
