@@ -1,37 +1,41 @@
-// This is a Node.js module for handling signaling in your server.
+// SignalingRoutes.js
 
-// You should already have a WebSocket server set up and passed into this module.
 module.exports = function (wss) {
+    const channels = {};
+  
     wss.on('connection', function (ws) {
-      console.log('Client connected to signaling channel.');
-  
       ws.on('message', function (message) {
-        console.log('Received message:', message);
-        // Parse the message and handle it appropriately.
-        // Typically, you would want to identify the type of message
-        // and broadcast it to the other peer(s) involved in the connection.
-        
-        const parsedMessage = JSON.parse(message);
+        const data = JSON.parse(message);
   
-        switch (parsedMessage.type) {
+        switch (data.type) {
+          case 'join':
+            // A user wants to join or create a channel
+            const channel = data.channel;
+            if (!channels[channel]) {
+              channels[channel] = [];
+            }
+            channels[channel].push(ws);
+            break;
           case 'offer':
           case 'answer':
           case 'ice-candidate':
-            // For the purpose of this example, we broadcast the message to all connected clients.
-            // In a real application, you would only send the message to the specific client
-            // that is supposed to receive it, based on your application logic.
-            wss.clients.forEach(function (client) {
-              if (client !== ws && client.readyState === WebSocket.OPEN) {
-                client.send(message);
+            // Send message to peers in the same channel
+            const peers = channels[data.channel] || [];
+            peers.forEach(peer => {
+              if (peer !== ws && peer.readyState === WebSocket.OPEN) {
+                peer.send(message);
               }
             });
             break;
-          // Handle other message types as necessary.
+          // Add additional cases as needed
         }
       });
   
       ws.on('close', function () {
-        console.log('Client has disconnected.');
+        // Remove the client from all channels
+        Object.keys(channels).forEach(channel => {
+          channels[channel] = channels[channel].filter(peer => peer !== ws);
+        });
       });
     });
   };

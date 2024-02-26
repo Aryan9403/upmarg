@@ -1,26 +1,38 @@
 import React, { useEffect, useRef, useContext } from 'react';
 import { WebSocketContext } from './WebSocketContext'; // Assume you have a context for WebSocket
 
-const Signaling = () => {
+const Signaling = ({ channel }) => {
   const ws = useContext(WebSocketContext); // Obtain WebSocket connection from context
   const pc = useRef(new RTCPeerConnection());
 
   useEffect(() => {
-    // Define what to do when icecandidates are generated
-    pc.current.onicecandidate = (event) => {
+    // Send a message to join the specific channel
+    if (ws.readyState === WebSocket.OPEN) {
+      ws.send(JSON.stringify({ type: 'join', channel }));
+    } else {
+      ws.addEventListener('open', () => {
+        ws.send(JSON.stringify({ type: 'join', channel }));
+      }, { once: true });
+    }
+
+    // Handle ICE candidates
+    pc.current.onicecandidate = event => {
       if (event.candidate) {
-        ws.send(JSON.stringify({ type: 'ice-candidate', candidate: event.candidate }));
+        ws.send(JSON.stringify({
+          type: 'ice-candidate',
+          candidate: event.candidate,
+          channel: channel
+        }));
       }
     };
 
-    // Define what to do when a track is received
-    pc.current.ontrack = (event) => {
-      // Here you would handle the incoming media stream track
-      // For example, assigning it to a video element to display
+    // Handle incoming media stream track
+    pc.current.ontrack = event => {
+      // Here you would handle the incoming media stream track, such as assigning it to a video element to display
     };
 
-    // When receiving a message from the signaling server
-    ws.onmessage = async (message) => {
+    // Handle messages from the signaling server
+    const handleMessage = async (message) => {
       const data = JSON.parse(message.data);
       
       switch(data.type) {
@@ -28,7 +40,11 @@ const Signaling = () => {
           await pc.current.setRemoteDescription(new RTCSessionDescription(data.offer));
           const answer = await pc.current.createAnswer();
           await pc.current.setLocalDescription(answer);
-          ws.send(JSON.stringify({type: 'answer', answer}));
+          ws.send(JSON.stringify({
+            type: 'answer',
+            answer: answer,
+            channel: channel
+          }));
           break;
         case 'answer':
           await pc.current.setRemoteDescription(new RTCSessionDescription(data.answer));
@@ -42,11 +58,13 @@ const Signaling = () => {
       }
     };
 
+    ws.addEventListener('message', handleMessage);
+
     return () => {
       // Cleanup WebSocket listeners when the component unmounts
-      ws.onmessage = null;
+      ws.removeEventListener('message', handleMessage);
     };
-  }, [ws]);
+  }, [ws, channel]); // Added 'channel' as a dependency to the useEffect hook
 
   // Signaling component does not render anything
   return null;
