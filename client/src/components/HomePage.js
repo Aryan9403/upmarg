@@ -1,8 +1,15 @@
-// client/src/components/HomePage.js
-import React from "react";
+import React, { useEffect, useState } from 'react';
 
 function HomePage() {
-  return <div>Welcome to UpMarg!</div>;
+  const [message, setMessage] = useState('');
+
+  useEffect(() => {
+    fetch('/test')
+      .then((res) => res.json())
+      .then((data) => setMessage(data.message));
+  }, []);
+
+  return <div>{message || 'Loading...'}</div>;
 }
 
 export default HomePage;
