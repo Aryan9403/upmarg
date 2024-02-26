@@ -5,7 +5,6 @@ import HomePage from './components/HomePage';
 import LoginPage from './components/LoginPage';
 import RegisterPage from './components/RegisterPage';
 import AboutPage from './components/AboutPage'; // Import the AboutPage component
-import 'C:\Users\Aryan\Desktop\upmarg\client\src\Assets\Styles\pico-main';
 
 
 
