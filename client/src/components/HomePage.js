@@ -1,8 +1,8 @@
-// client/src/components/HomePage.js
 import React, { useState, useEffect } from 'react';
+import './HomePage.css'; // Make sure to import the CSS stylesheet
 
 function HomePage() {
-  // State to store fetched data (if needed)
+  // State to store fetched data
   const [data, setData] = useState(null);
 
   // Simulated fetching of data
@@ -19,10 +19,14 @@ function HomePage() {
   }, []); // The empty array ensures this effect runs only once after the initial render
 
   return (
-    <div>
+    <div className="homePageContainer">
       <h1>Welcome to UpMarg</h1>
       <p>This is the homepage of your educational streaming marketplace platform.</p>
-      {data ? <p>{data.message}</p> : <p>Loading...</p>}
+      {data ? (
+        <p className="dataMessage">{data.message}</p>
+      ) : (
+        <p className="loadingMessage">Loading...</p>
+      )}
     </div>
   );
 }
