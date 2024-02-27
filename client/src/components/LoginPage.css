@@ -1,32 +1,66 @@
-/* LoginPage.css */
-.login-form {
-    max-width: 300px;
-    margin: auto;
-    padding: 20px;
-    border-radius: 5px;
-    background-color: #f7f7f7;
-  }
-  
-  .login-form input[type="email"],
-  .login-form input[type="password"] {
-    width: 100%;
-    padding: 10px;
-    margin: 10px 0;
-    border: 1px solid #ddd;
-    box-sizing: border-box; /* Add this to manage padding and widths */
-  }
-  
-  .login-form button {
-    width: 100%;
-    padding: 10px;
-    background-color: #5c5c5c;
-    color: white;
-    cursor: pointer;
-    border: none;
-    border-radius: 5px;
-  }
-  
-  .login-form button:hover {
-    background-color: #434343;
-  }
-  
+/* LoginPage.css - Minimalist and Professional StyleSheet */
+
+/* Color palette */
+:root {
+  --input-background: #f0f0f0; /* Light grey background for input fields for subtle contrast */
+  --input-border: #ddd; /* Grey border for inputs */
+  --button-background: #0e1a40; /* Deep blue for buttons to match the navbar */
+  --button-text: #ffffff; /* White text for buttons for readability */
+  --button-hover: #222f5b; /* Slightly lighter blue for button hover state */
+}
+
+/* Base styles for the form */
+form {
+  max-width: 300px; /* Maximum width of the form for better aesthetics */
+  margin: 50px auto; /* Center the form on the page with vertical spacing */
+  padding: 20px; /* Padding inside the form */
+  display: flex;
+  flex-direction: column;
+  gap: 10px; /* Spacing between form elements */
+}
+
+/* Heading styles */
+form h2 {
+  color: var(--button-background); /* Using the navbar color for consistency */
+  text-align: center; /* Centering the heading */
+  margin-bottom: 20px; /* Spacing after the heading */
+}
+
+/* Label styles */
+form label {
+  display: block; /* Ensure the label takes up its own line */
+  margin-bottom: 5px; /* Spacing between label and input */
+}
+
+/* Input field styles */
+form input[type="email"],
+form input[type="password"] {
+  width: 100%; /* Make input fields take up the full container width */
+  padding: 8px; /* Padding inside the input fields */
+  margin-bottom: 10px; /* Spacing after each input */
+  border: 1px solid var(--input-border);
+  background-color: var(--input-background);
+  transition: border-color 0.3s; /* Transition for border color change on focus */
+}
+
+/* Input focus state */
+form input[type="email"]:focus,
+form input[type="password"]:focus {
+  border-color: var(--button-background); /* Change border color to blue on focus */
+  outline: none; /* Remove the default focus outline */
+}
+
+/* Button styles */
+form button {
+  padding: 10px;
+  background-color: var(--button-background);
+  color: var(--button-text);
+  border: none; /* Remove default border */
+  cursor: pointer; /* Change cursor to pointer to indicate button */
+  transition: background-color 0.3s; /* Transition for background color on hover */
+}
+
+/* Button hover state */
+form button:hover {
+  background-color: var(--button-hover);
+}
